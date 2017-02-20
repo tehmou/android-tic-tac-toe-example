@@ -8,6 +8,8 @@ import android.view.MotionEvent;
 import com.jakewharton.rxbinding2.view.RxView;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.subjects.BehaviorSubject;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -25,8 +27,6 @@ public class MainActivity extends AppCompatActivity {
 
         GameGrid emptyGrid = new GameGrid(GRID_WIDTH, GRID_HEIGHT);
 
-        gameGridView.setData(emptyGrid);
-
         Observable<MotionEvent> userTouchEventObservable =
                 RxView.touches(gameGridView)
                         .filter(ev -> ev.getAction() == MotionEvent.ACTION_UP);
@@ -39,8 +39,17 @@ public class MainActivity extends AppCompatActivity {
                                         gameGridView.getWidth(), gameGridView.getHeight(),
                                         GRID_WIDTH, GRID_HEIGHT));
 
+        BehaviorSubject<GameGrid> gameGridSubject = BehaviorSubject.createDefault(emptyGrid);
+
         gridPositionEventObservable
-                .subscribe(gridPosition -> Log.d(TAG, gridPosition.toString()));
+                .withLatestFrom(gameGridSubject,
+                        (gridPosition, gameGrid) ->
+                                gameGrid.setSymbolAt(gridPosition, GameSymbol.CIRCLE))
+                .subscribe(gameGridSubject::onNext);
+
+        gameGridSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(gameGridView::setData);
     }
 
     private static GridPosition getGridPosition(float touchX, float touchY,

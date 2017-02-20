@@ -24,8 +24,8 @@ public class GameGrid {
 
     private GameGrid copy() {
         GameSymbol[][] grid = new GameSymbol[width][height];
-        for (int i = 0; i < 3; i ++) {
-            System.arraycopy(grid[i], 0, grid[i], 0, 3);
+        for (int i = 0; i < width; i ++) {
+            System.arraycopy(this.grid[i], 0, grid[i], 0, height);
         }
         return new GameGrid(width, height, grid);
     }
