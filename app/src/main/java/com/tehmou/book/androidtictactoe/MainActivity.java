@@ -12,17 +12,6 @@ import rx.Observable;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final GameSymbol[][] EMPTY_GRID = new GameSymbol[][]{
-            new GameSymbol[]{
-                    GameSymbol.EMPTY, GameSymbol.EMPTY, GameSymbol.EMPTY
-            },
-            new GameSymbol[]{
-                    GameSymbol.EMPTY, GameSymbol.EMPTY, GameSymbol.EMPTY
-            },
-            new GameSymbol[]{
-                    GameSymbol.EMPTY, GameSymbol.EMPTY, GameSymbol.EMPTY
-            }
-    };
     private static final int GRID_WIDTH = 3;
     private static final int GRID_HEIGHT = 3;
 
@@ -34,7 +23,9 @@ public class MainActivity extends AppCompatActivity {
         GameGridView gameGridView =
                 (GameGridView) findViewById(R.id.grid_view);
 
-        gameGridView.setData(EMPTY_GRID);
+        GameGrid emptyGrid = new GameGrid(GRID_WIDTH, GRID_HEIGHT);
+
+        gameGridView.setData(emptyGrid);
 
         Observable<MotionEvent> userTouchEventObservable =
                 RxView.touches(gameGridView)

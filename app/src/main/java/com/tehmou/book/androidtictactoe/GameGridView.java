@@ -14,7 +14,7 @@ import android.view.View;
 
 public class GameGridView extends View {
     private static final String TAG = GameGridView.class.getSimpleName();
-    private GameSymbol[][] gameState;
+    private GameGrid gameGrid;
     private int width;
     private int height;
     private final Paint linePaint;
@@ -74,13 +74,13 @@ public class GameGridView extends View {
     private void drawSymbols(Canvas canvas,
                              float gridWidth, float gridHeight,
                              float tileWidth, float tileHeight) {
-        if (gameState == null) {
+        if (gameGrid == null) {
             return;
         }
         
         for (int i = 0; i < gridWidth; i++) {
             for (int n = 0; n < gridHeight; n++) {
-                GameSymbol symbol = gameState[i][n];
+                GameSymbol symbol = gameGrid.getSymbolAt(i, n);
                 RectF dst = new RectF(i * tileWidth, n * tileHeight,
                         (i + 1) * tileWidth, (n + 1) * tileHeight);
                 if (symbol == GameSymbol.CIRCLE) {
@@ -111,8 +111,8 @@ public class GameGridView extends View {
         }
     }
 
-    public void setData(GameSymbol[][] gameState) {
-        this.gameState = gameState;
+    public void setData(GameGrid gameGrid) {
+        this.gameGrid = gameGrid;
         invalidate();
     }
 }
