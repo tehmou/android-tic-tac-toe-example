@@ -16,7 +16,27 @@ public class GameGrid {
         }
     }
 
-    public GameSymbol getSymbolAt(int i, int n) {
-        return grid[i][n];
+    public GameGrid(int width, int height, GameSymbol[][] grid) {
+        this.width = width;
+        this.height = height;
+        this.grid = grid;
+    }
+
+    private GameGrid copy() {
+        GameSymbol[][] grid = new GameSymbol[width][height];
+        for (int i = 0; i < 3; i ++) {
+            System.arraycopy(grid[i], 0, grid[i], 0, 3);
+        }
+        return new GameGrid(width, height, grid);
+    }
+
+    public GameSymbol getSymbolAt(int x, int y) {
+        return grid[x][y];
+    }
+
+    public GameGrid setSymbolAt(GridPosition position, GameSymbol symbol) {
+        GameGrid copy = this.copy();
+        copy.grid[position.getX()][position.getY()] = symbol;
+        return copy;
     }
 }
