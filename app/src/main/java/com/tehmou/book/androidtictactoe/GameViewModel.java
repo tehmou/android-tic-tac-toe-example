@@ -12,6 +12,7 @@ public class GameViewModel {
     private final CompositeSubscription subscriptions = new CompositeSubscription();
 
     private final BehaviorSubject<GameGrid> gameGridSubject = BehaviorSubject.create(EMPTY_GRID);
+    private final BehaviorSubject<GameSymbol> playerInTurnSubject = BehaviorSubject.create(GameSymbol.CIRCLE);
 
     private final Observable<GridPosition> touchEventObservable;
 
@@ -21,6 +22,10 @@ public class GameViewModel {
 
     public Observable<GameGrid> getGameGrid() {
         return gameGridSubject.asObservable();
+    }
+
+    public Observable<GameSymbol> getPlayerInTurn() {
+        return playerInTurnSubject.asObservable();
     }
 
     public void subscribe() {
