@@ -22,4 +22,8 @@ public class GameState {
                 gameGrid.setSymbolAt(gridPosition, symbol), symbol
         );
     }
+
+    public boolean isEmpty(GridPosition gridPosition) {
+        return gameGrid.getSymbolAt(gridPosition) == GameSymbol.EMPTY;
+    }
 }

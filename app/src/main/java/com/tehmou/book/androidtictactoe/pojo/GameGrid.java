@@ -30,6 +30,10 @@ public class GameGrid {
         return new GameGrid(width, height, grid);
     }
 
+    public GameSymbol getSymbolAt(GridPosition gridPosition) {
+        return getSymbolAt(gridPosition.getX(), gridPosition.getY());
+    }
+
     public GameSymbol getSymbolAt(int x, int y) {
         return grid[x][y];
     }
