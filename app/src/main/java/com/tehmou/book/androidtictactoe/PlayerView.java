@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
+
 public class PlayerView extends ImageView {
     public PlayerView(Context context) {
         super(context);

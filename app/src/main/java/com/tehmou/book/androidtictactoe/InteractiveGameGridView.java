@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.jakewharton.rxbinding2.view.RxView;
+import com.tehmou.book.androidtictactoe.pojo.GridPosition;
 
 import io.reactivex.Observable;
 

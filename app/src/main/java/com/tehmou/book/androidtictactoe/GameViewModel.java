@@ -3,6 +3,9 @@ package com.tehmou.book.androidtictactoe;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
+import com.tehmou.book.androidtictactoe.pojo.GameGrid;
+import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
+import com.tehmou.book.androidtictactoe.pojo.GridPosition;
 
 public class GameViewModel {
     private static final int GRID_WIDTH = 3;

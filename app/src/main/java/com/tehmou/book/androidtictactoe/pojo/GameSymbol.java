@@ -1,4 +1,4 @@
-package com.tehmou.book.androidtictactoe;
+package com.tehmou.book.androidtictactoe.pojo;
 
 public enum GameSymbol {
     EMPTY, CIRCLE, CROSS
