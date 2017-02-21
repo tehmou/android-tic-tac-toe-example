@@ -12,6 +12,7 @@ public class GameViewModel {
     private final CompositeDisposable subscriptions = new CompositeDisposable();
 
     private final BehaviorSubject<GameGrid> gameGridSubject = BehaviorSubject.createDefault(EMPTY_GRID);
+    private final BehaviorSubject<GameSymbol> playerInTurnSubject = BehaviorSubject.createDefault(GameSymbol.CIRCLE);
 
     private final Observable<GridPosition> touchEventObservable;
 
@@ -21,6 +22,10 @@ public class GameViewModel {
 
     public Observable<GameGrid> getGameGrid() {
         return gameGridSubject.hide();
+    }
+
+    public Observable<GameSymbol> getPlayerInTurn() {
+        return playerInTurnSubject.hide();
     }
 
     public void subscribe() {
