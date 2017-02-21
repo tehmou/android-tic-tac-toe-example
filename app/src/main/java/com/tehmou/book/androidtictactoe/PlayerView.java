@@ -27,6 +27,9 @@ public class PlayerView extends ImageView {
             case CROSS:
                 setImageResource(R.drawable.symbol_cross);
                 break;
+            case TRIANGLE:
+                setImageResource(R.drawable.symbol_triangle);
+                break;
             default:
                 setImageResource(0);
         }
