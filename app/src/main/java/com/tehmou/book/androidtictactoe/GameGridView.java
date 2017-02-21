@@ -12,6 +12,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.tehmou.book.androidtictactoe.pojo.GameGrid;
+import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
+
 public class GameGridView extends View {
     private static final String TAG = GameGridView.class.getSimpleName();
     private GameGrid gameGrid;
