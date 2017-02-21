@@ -61,8 +61,8 @@ public class GameGridView extends View {
 
         Log.d(TAG, "width: " + width + ", height: " + height);
 
-        final float gridWidth = 3;
-        final float gridHeight = 3;
+        final float gridWidth = getGridWidth();
+        final float gridHeight = getGridHeight();
 
         final float tileWidth = width / gridWidth;
         final float tileHeight = height / gridHeight;
@@ -114,5 +114,13 @@ public class GameGridView extends View {
     public void setData(GameGrid gameGrid) {
         this.gameGrid = gameGrid;
         invalidate();
+    }
+
+    public int getGridWidth() {
+        return this.gameGrid.getWidth();
+    }
+
+    public int getGridHeight() {
+        return this.gameGrid.getHeight();
     }
 }

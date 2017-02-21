@@ -1,21 +1,18 @@
 package com.tehmou.book.androidtictactoe;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 
 import com.jakewharton.rxbinding2.view.RxView;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.subjects.BehaviorSubject;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int GRID_WIDTH = 3;
-    private static final int GRID_HEIGHT = 3;
+    private GameViewModel gameViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,8 +21,6 @@ public class MainActivity extends AppCompatActivity {
 
         GameGridView gameGridView =
                 (GameGridView) findViewById(R.id.grid_view);
-
-        GameGrid emptyGrid = new GameGrid(GRID_WIDTH, GRID_HEIGHT);
 
         Observable<MotionEvent> userTouchEventObservable =
                 RxView.touches(gameGridView)
@@ -37,19 +32,22 @@ public class MainActivity extends AppCompatActivity {
                                 getGridPosition(
                                         ev.getX(), ev.getY(),
                                         gameGridView.getWidth(), gameGridView.getHeight(),
-                                        GRID_WIDTH, GRID_HEIGHT));
+                                        gameGridView.getGridWidth(),
+                                        gameGridView.getGridHeight()));
 
-        BehaviorSubject<GameGrid> gameGridSubject = BehaviorSubject.createDefault(emptyGrid);
+        gameViewModel = new GameViewModel(gridPositionEventObservable);
 
-        gridPositionEventObservable
-                .withLatestFrom(gameGridSubject,
-                        (gridPosition, gameGrid) ->
-                                gameGrid.setSymbolAt(gridPosition, GameSymbol.CIRCLE))
-                .subscribe(gameGridSubject::onNext);
-
-        gameGridSubject
+        gameViewModel.getGameGrid()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(gameGridView::setData);
+
+        gameViewModel.subscribe();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        gameViewModel.unsubscribe();
     }
 
     private static GridPosition getGridPosition(float touchX, float touchY,
