@@ -2,6 +2,9 @@ package com.tehmou.book.androidtictactoe;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
+
+import com.tehmou.book.androidtictactoe.pojo.GridPosition;
 
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -21,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
         PlayerView playerInTurnImageView =
                 (PlayerView) findViewById(R.id.player_in_turn_image_view);
 
+        TextView lastMoveTextView =
+                (TextView) findViewById(R.id.last_move_text);
+
         gameViewModel = new GameViewModel(
                 gameGridView.getTouchesOnGrid()
         );
@@ -32,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
         gameViewModel.getPlayerInTurn()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(playerInTurnImageView::setData);
+
+        gameViewModel.getLastMove()
+                .map(GridPosition::toString)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(lastMoveTextView::setText);
 
         gameViewModel.subscribe();
     }
