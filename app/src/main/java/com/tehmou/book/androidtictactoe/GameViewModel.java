@@ -1,5 +1,9 @@
 package com.tehmou.book.androidtictactoe;
 
+import com.tehmou.book.androidtictactoe.pojo.GameGrid;
+import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
+import com.tehmou.book.androidtictactoe.pojo.GridPosition;
+
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 import rx.subscriptions.CompositeSubscription;
