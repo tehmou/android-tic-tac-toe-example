@@ -29,10 +29,15 @@ public class GameViewModel {
         playerInTurnSubject = gameStateSubject
                 .map(GameState::getLastPlayedSymbol)
                 .map(symbol -> {
-                    if (symbol == GameSymbol.CIRCLE) {
-                        return GameSymbol.CROSS;
-                    } else {
-                        return GameSymbol.CIRCLE;
+                    switch (symbol) {
+                        case CIRCLE:
+                            return GameSymbol.CROSS;
+                        case CROSS:
+                            return GameSymbol.TRIANGLE;
+                        case TRIANGLE:
+                        case EMPTY:
+                        default:
+                            return GameSymbol.CIRCLE;
                     }
                 });
     }
