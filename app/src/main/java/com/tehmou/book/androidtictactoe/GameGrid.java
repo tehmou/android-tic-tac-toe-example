@@ -39,4 +39,12 @@ public class GameGrid {
         copy.grid[position.getX()][position.getY()] = symbol;
         return copy;
     }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 }
