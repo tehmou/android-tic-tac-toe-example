@@ -19,8 +19,9 @@ public class GameViewModel {
 
     private final CompositeDisposable subscriptions = new CompositeDisposable();
 
-    private final BehaviorSubject<GameState> gameStateSubject = BehaviorSubject.createDefault(EMPTY_GAME);
     private final Observable<GameSymbol> playerInTurnObservable;
+    private final BehaviorSubject<GameState> gameStateSubject = BehaviorSubject.createDefault(EMPTY_GAME);
+    private final BehaviorSubject<GridPosition> lastMoveSubject = BehaviorSubject.create();
 
     private final Observable<GridPosition> touchEventObservable;
 
@@ -52,7 +53,15 @@ public class GameViewModel {
         return playerInTurnObservable;
     }
 
+    public Observable<GridPosition> getLastMove() {
+        return lastMoveSubject.hide();
+    }
+
     public void subscribe() {
+        subscriptions.add(touchEventObservable
+                .subscribe(lastMoveSubject::onNext)
+        );
+
         Observable<Pair<GameState, GameSymbol>> gameInfoObservable =
                 Observable.combineLatest(gameStateSubject, playerInTurnObservable, Pair::new);
 
