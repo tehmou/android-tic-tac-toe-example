@@ -34,10 +34,10 @@ public class GameViewModel {
         playerInTurnObservable = gameStateSubject
                 .map(GameState::getLastPlayedSymbol)
                 .map(symbol -> {
-                    if (symbol == GameSymbol.CIRCLE) {
-                        return GameSymbol.CROSS;
+                    if (symbol == GameSymbol.BLACK) {
+                        return GameSymbol.RED;
                     } else {
-                        return GameSymbol.CIRCLE;
+                        return GameSymbol.BLACK;
                     }
                 });
         gameStatusObservable = gameStateSubject

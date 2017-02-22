@@ -21,11 +21,11 @@ public class PlayerView extends ImageView {
 
     public void setData(GameSymbol gameSymbol) {
         switch(gameSymbol) {
-            case CIRCLE:
-                setImageResource(R.drawable.symbol_circle);
+            case BLACK:
+                setImageResource(R.drawable.symbol_black_circle);
                 break;
-            case CROSS:
-                setImageResource(R.drawable.symbol_cross);
+            case RED:
+                setImageResource(R.drawable.symbol_red_circle);
                 break;
             default:
                 setImageResource(0);

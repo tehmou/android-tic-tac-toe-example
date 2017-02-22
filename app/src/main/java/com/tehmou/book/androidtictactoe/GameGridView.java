@@ -22,8 +22,8 @@ public class GameGridView extends View {
     private int height;
     private final Paint linePaint;
     private final Paint bitmapPaint;
-    private final Bitmap circleBitmap;
-    private final Bitmap crossBitmap;
+    private final Bitmap blackPlayerBitmap;
+    private final Bitmap redPlayerBitmap;
     private final Rect bitmapSrcRect;
 
     public GameGridView(Context context) {
@@ -43,9 +43,9 @@ public class GameGridView extends View {
 
         bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        circleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.symbol_circle);
-        crossBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.symbol_cross);
-        bitmapSrcRect = new Rect(0, 0, circleBitmap.getWidth(), circleBitmap.getHeight());
+        blackPlayerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.symbol_black_circle);
+        redPlayerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.symbol_red_circle);
+        bitmapSrcRect = new Rect(0, 0, blackPlayerBitmap.getWidth(), blackPlayerBitmap.getHeight());
     }
 
     @Override
@@ -86,14 +86,14 @@ public class GameGridView extends View {
                 GameSymbol symbol = gameGrid.getSymbolAt(i, n);
                 RectF dst = new RectF(i * tileWidth, n * tileHeight,
                         (i + 1) * tileWidth, (n + 1) * tileHeight);
-                if (symbol == GameSymbol.CIRCLE) {
+                if (symbol == GameSymbol.BLACK) {
                     canvas.drawBitmap(
-                            circleBitmap,
+                            blackPlayerBitmap,
                             bitmapSrcRect, dst,
                             bitmapPaint);
-                } else if (symbol == GameSymbol.CROSS) {
+                } else if (symbol == GameSymbol.RED) {
                     canvas.drawBitmap(
-                            crossBitmap,
+                            redPlayerBitmap,
                             bitmapSrcRect, dst,
                             bitmapPaint);
                 }
