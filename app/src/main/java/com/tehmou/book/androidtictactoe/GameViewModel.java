@@ -25,9 +25,12 @@ public class GameViewModel {
     private final Observable<GameStatus> gameStatusObservable;
 
     private final Observable<GridPosition> touchEventObservable;
+    private final Observable<Object> newGameEventObservable;
 
-    public GameViewModel(Observable<GridPosition> touchEventObservable) {
+    public GameViewModel(Observable<GridPosition> touchEventObservable,
+                         Observable<Object> newGameEventObservable) {
         this.touchEventObservable = touchEventObservable;
+        this.newGameEventObservable = newGameEventObservable;
         playerInTurnObservable = gameStateSubject
                 .map(GameState::getLastPlayedSymbol)
                 .map(symbol -> {
@@ -52,6 +55,11 @@ public class GameViewModel {
     }
 
     public void subscribe() {
+        subscriptions.add(newGameEventObservable
+                .map(ignore -> EMPTY_GAME)
+                .subscribe(gameStateSubject::onNext)
+        );
+
         Observable<Pair<GameState, GameSymbol>> gameInfoObservable =
                 Observable.combineLatest(gameStateSubject, playerInTurnObservable, Pair::new);
 

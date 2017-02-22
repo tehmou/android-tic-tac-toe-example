@@ -3,8 +3,10 @@ package com.tehmou.book.androidtictactoe;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.tehmou.book.androidtictactoe.pojo.GameStatus;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private PlayerView playerInTurnImageView;
     private View winnerView;
     private TextView winnerTextView;
+    private Button newGameButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +33,11 @@ public class MainActivity extends AppCompatActivity {
         playerInTurnImageView = (PlayerView) findViewById(R.id.player_in_turn_image_view);
         winnerView = findViewById(R.id.winner_view);
         winnerTextView = (TextView) findViewById(R.id.winner_text_view);
+        newGameButton = (Button) findViewById(R.id.new_game_button);
 
         gameViewModel = new GameViewModel(
-                gameGridView.getTouchesOnGrid()
+                gameGridView.getTouchesOnGrid(),
+                RxView.clicks(newGameButton)
         );
         gameViewModel.subscribe();
         makeViewBinding();
