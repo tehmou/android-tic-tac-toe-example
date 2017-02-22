@@ -15,6 +15,23 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_centerInParent="true"/>
+    <FrameLayout
+        android:id="@+id/winner_view"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:alpha="0.9"
+        android:background="#fff">
+        <TextView
+            android:id="@+id/winner_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="30dp"
+            android:textColor="#000"/>
+    </FrameLayout>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"

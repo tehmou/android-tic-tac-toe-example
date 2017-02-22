@@ -4,6 +4,7 @@ import android.support.v4.util.Pair;
 
 import com.tehmou.book.androidtictactoe.pojo.GameGrid;
 import com.tehmou.book.androidtictactoe.pojo.GameState;
+import com.tehmou.book.androidtictactoe.pojo.GameStatus;
 import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
 import com.tehmou.book.androidtictactoe.pojo.GridPosition;
 
@@ -21,6 +22,7 @@ public class GameViewModel {
 
     private final BehaviorSubject<GameState> gameStateSubject = BehaviorSubject.createDefault(EMPTY_GAME);
     private final Observable<GameSymbol> playerInTurnObservable;
+    private final Observable<GameStatus> gameStatusObservable;
 
     private final Observable<GridPosition> touchEventObservable;
 
@@ -35,6 +37,8 @@ public class GameViewModel {
                         return GameSymbol.CIRCLE;
                     }
                 });
+        gameStatusObservable = gameStateSubject
+                .map(GameUtils::calculateGameStatus);
     }
 
     public Observable<GameGrid> getGameGrid() {
@@ -71,5 +75,9 @@ public class GameViewModel {
 
     public void unsubscribe() {
         subscriptions.clear();
+    }
+
+    public Observable<GameStatus> getGameStatus() {
+        return gameStatusObservable;
     }
 }
