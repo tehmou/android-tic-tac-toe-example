@@ -5,61 +5,78 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.tehmou.book.androidtictactoe.pojo.GameState;
 import com.tehmou.book.androidtictactoe.pojo.GameStatus;
 
 import rx.android.schedulers.AndroidSchedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private CompositeSubscription viewSubscriptions = new CompositeSubscription();
     private GameViewModel gameViewModel;
+
+    private InteractiveGameGridView gameGridView;
+    private PlayerView playerInTurnImageView;
+    private View winnerView;
+    private TextView winnerTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        InteractiveGameGridView gameGridView =
-                (InteractiveGameGridView) findViewById(R.id.grid_view);
-
-        PlayerView playerInTurnImageView =
-                (PlayerView) findViewById(R.id.player_in_turn_image_view);
-
-        View winnerView = findViewById(R.id.winner_view);
-        TextView winnerTextView = (TextView) findViewById(R.id.winner_text_view);
+        gameGridView = (InteractiveGameGridView) findViewById(R.id.grid_view);
+        playerInTurnImageView = (PlayerView) findViewById(R.id.player_in_turn_image_view);
+        winnerView = findViewById(R.id.winner_view);
+        winnerTextView = (TextView) findViewById(R.id.winner_text_view);
 
         gameViewModel = new GameViewModel(
                 gameGridView.getTouchesOnGrid()
         );
-
-        gameViewModel.getGameGrid()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(gameGridView::setData);
-
-        gameViewModel.getPlayerInTurn()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(playerInTurnImageView::setData);
-
-        gameViewModel.getGameStatus()
-                .map(GameStatus::isEnded)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isEnded ->
-                        winnerView.setVisibility(
-                                isEnded ? View.VISIBLE : View.GONE));
-
-        gameViewModel.getGameStatus()
-                .map(gameStatus ->
-                        gameStatus.isEnded() ? "Winner: " + gameStatus.getWinner() : "Ongoing")
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(winnerTextView::setText);
-
         gameViewModel.subscribe();
+        makeViewBinding();
+    }
+
+    private void makeViewBinding() {
+        viewSubscriptions.add(
+            gameViewModel.getGameGrid()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(gameGridView::setData)
+        );
+
+        viewSubscriptions.add(
+            gameViewModel.getPlayerInTurn()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(playerInTurnImageView::setData)
+        );
+
+        viewSubscriptions.add(
+            gameViewModel.getGameStatus()
+                    .map(GameStatus::isEnded)
+                    .map(isEnded -> isEnded ? View.VISIBLE : View.GONE)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(winnerView::setVisibility)
+        );
+
+        viewSubscriptions.add(
+            gameViewModel.getGameStatus()
+                    .map(gameStatus ->
+                            gameStatus.isEnded() ?
+                                    "Winner: " + gameStatus.getWinner() : "")
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(winnerTextView::setText)
+        );
+    }
+
+    private void releaseViewBinding() {
+        viewSubscriptions.clear();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        releaseViewBinding();
         gameViewModel.unsubscribe();
     }
 }
