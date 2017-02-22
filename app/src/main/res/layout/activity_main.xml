@@ -47,4 +47,12 @@
             android:layout_width="30dp"
             android:layout_height="30dp"/>
     </LinearLayout>
+    <Button
+        android:id="@+id/new_game_button"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:text="New Game"
+        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>
