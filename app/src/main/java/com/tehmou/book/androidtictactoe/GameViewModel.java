@@ -55,8 +55,14 @@ public class GameViewModel {
         Observable<Pair<GameState, GameSymbol>> gameInfoObservable =
                 Observable.combineLatest(gameStateSubject, playerInTurnObservable, Pair::new);
 
-        Observable<GridPosition> filteredTouchesEventObservable =
+        Observable<GridPosition> gameNotEndedTouches =
                 touchEventObservable
+                        .withLatestFrom(gameStatusObservable, Pair::new)
+                        .filter(pair -> !pair.second.isEnded())
+                        .map(pair -> pair.first);
+
+        Observable<GridPosition> filteredTouches =
+                gameNotEndedTouches
                         .withLatestFrom(gameStateSubject, Pair::new)
                         .filter(pair -> {
                             GridPosition gridPosition = pair.first;
@@ -65,7 +71,7 @@ public class GameViewModel {
                         })
                         .map(pair -> pair.first);
 
-        subscriptions.add(filteredTouchesEventObservable
+        subscriptions.add(filteredTouches
                 .withLatestFrom(gameInfoObservable,
                         (gridPosition, gameInfo) ->
                                 gameInfo.first.setSymbolAt(
