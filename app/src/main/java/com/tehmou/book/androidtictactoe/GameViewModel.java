@@ -13,8 +13,8 @@ import rx.subjects.BehaviorSubject;
 import rx.subscriptions.CompositeSubscription;
 
 public class GameViewModel {
-    private static final int GRID_WIDTH = 3;
-    private static final int GRID_HEIGHT = 3;
+    private static final int GRID_WIDTH = 7;
+    private static final int GRID_HEIGHT = 7;
     private static final GameGrid EMPTY_GRID = new GameGrid(GRID_WIDTH, GRID_HEIGHT);
     private static final GameState EMPTY_GAME = new GameState(EMPTY_GRID, GameSymbol.EMPTY);
 
