@@ -72,12 +72,8 @@ public class GameViewModel {
         Observable<GridPosition> filteredTouches =
                 gameNotEndedTouches
                         .withLatestFrom(gameStateSubject, Pair::new)
-                        .filter(pair -> {
-                            GridPosition gridPosition = pair.first;
-                            GameState gameState = pair.second;
-                            return gameState.isEmpty(gridPosition);
-                        })
-                        .map(pair -> pair.first);
+                        .map(pair -> dropMarker(pair.first, pair.second.getGameGrid()))
+                        .filter(position -> position.getY() >= 0);
 
         subscriptions.add(filteredTouches
                 .withLatestFrom(gameInfoObservable,
@@ -85,6 +81,23 @@ public class GameViewModel {
                                 gameInfo.first.setSymbolAt(
                                         gridPosition, gameInfo.second))
                 .subscribe(gameStateSubject::onNext));
+    }
+
+    private static GridPosition dropMarker(GridPosition gridPosition, GameGrid gameGrid) {
+        int i = gameGrid.getHeight() - 1;
+        for (; i >= -1; i--) {
+            if (i == -1) {
+                // Let -1 fall through
+                break;
+            }
+            GameSymbol symbol =
+                    gameGrid.getSymbolAt(
+                            gridPosition.getX(), i);
+            if (symbol == GameSymbol.EMPTY) {
+                break;
+            }
+        }
+        return new GridPosition(gridPosition.getX(), i);
     }
 
     public void unsubscribe() {
