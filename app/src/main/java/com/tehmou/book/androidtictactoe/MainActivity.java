@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
+import com.tehmou.book.androidtictactoe.data.GameModel;
 import com.tehmou.book.androidtictactoe.pojo.GameStatus;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -16,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private CompositeSubscription viewSubscriptions = new CompositeSubscription();
+    private GameModel gameModel;
     private GameViewModel gameViewModel;
 
     private InteractiveGameGridView gameGridView;
@@ -29,18 +31,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        resolveViews();
+        createViewModel();
+        makeViewBinding();
+    }
+
+    private void resolveViews() {
         gameGridView = (InteractiveGameGridView) findViewById(R.id.grid_view);
         playerInTurnImageView = (PlayerView) findViewById(R.id.player_in_turn_image_view);
         winnerView = findViewById(R.id.winner_view);
         winnerTextView = (TextView) findViewById(R.id.winner_text_view);
         newGameButton = (Button) findViewById(R.id.new_game_button);
+    }
 
+    private void createViewModel() {
+        gameModel = new GameModel();
         gameViewModel = new GameViewModel(
+                gameModel,
                 gameGridView.getTouchesOnGrid(),
                 RxView.clicks(newGameButton)
         );
         gameViewModel.subscribe();
-        makeViewBinding();
     }
 
     private void makeViewBinding() {
