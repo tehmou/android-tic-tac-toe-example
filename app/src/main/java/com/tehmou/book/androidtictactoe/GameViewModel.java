@@ -19,7 +19,6 @@ public class GameViewModel {
 
     private final GameModel gameModel;
     private final Observable<GridPosition> touchEventObservable;
-    private final Observable<Object> newGameEventObservable;
 
     private final BehaviorSubject<GameState> gameStateSubject = BehaviorSubject.create();
 
@@ -27,11 +26,9 @@ public class GameViewModel {
     private final Observable<GameStatus> gameStatusObservable;
 
     public GameViewModel(GameModel gameModel,
-                         Observable<GridPosition> touchEventObservable,
-                         Observable<Object> newGameEventObservable) {
+                         Observable<GridPosition> touchEventObservable) {
         this.gameModel = gameModel;
         this.touchEventObservable = touchEventObservable;
-        this.newGameEventObservable = newGameEventObservable;
         playerInTurnObservable = this.gameModel.getActiveGameState()
                 .map(GameState::getLastPlayedSymbol)
                 .map(symbol -> {
@@ -63,10 +60,6 @@ public class GameViewModel {
     public void subscribe() {
         subscriptions.add(gameModel.getActiveGameState()
                 .subscribe(gameStateSubject::onNext)
-        );
-
-        subscriptions.add(newGameEventObservable
-                .subscribe(ignore -> gameModel.newGame())
         );
 
         Observable<Pair<GameState, GameSymbol>> gameInfoObservable =
