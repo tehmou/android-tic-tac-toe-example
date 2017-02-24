@@ -1,5 +1,6 @@
 package com.tehmou.book.androidtictactoe;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private View winnerView;
     private TextView winnerTextView;
     private Button newGameButton;
+    private Button saveGameButton;
+    private Button loadGameButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,19 +45,32 @@ public class MainActivity extends AppCompatActivity {
         winnerView = findViewById(R.id.winner_view);
         winnerTextView = (TextView) findViewById(R.id.winner_text_view);
         newGameButton = (Button) findViewById(R.id.new_game_button);
+        saveGameButton = (Button) findViewById(R.id.save_game_button);
+        loadGameButton = (Button) findViewById(R.id.load_game_button);
     }
 
     private void createViewModel() {
         gameModel = new GameModel();
         gameViewModel = new GameViewModel(
                 gameModel,
-                gameGridView.getTouchesOnGrid(),
-                RxView.clicks(newGameButton)
+                gameGridView.getTouchesOnGrid()
         );
         gameViewModel.subscribe();
     }
 
     private void makeViewBinding() {
+        // Handle new game, saving and loading games
+        viewSubscriptions.add(RxView.clicks(newGameButton)
+                .subscribe(ignore -> gameModel.newGame())
+        );
+        viewSubscriptions.add(RxView.clicks(saveGameButton)
+                .subscribe(ignore -> gameModel.saveActiveGame())
+        );
+        viewSubscriptions.add(RxView.clicks(loadGameButton)
+                .subscribe(ignore -> showLoadGameActivity())
+        );
+
+        // Bind the View Model
         viewSubscriptions.add(
             gameViewModel.getFullGameState()
                     .observeOn(AndroidSchedulers.mainThread())
@@ -94,5 +110,10 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         releaseViewBinding();
         gameViewModel.unsubscribe();
+    }
+
+    private void showLoadGameActivity() {
+        Intent intent = new Intent(this, LoadGameActivity.class);
+        startActivity(intent);
     }
 }
