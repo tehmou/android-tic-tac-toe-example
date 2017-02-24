@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Get the shared GameModel
+        gameModel = ((GameApplication) getApplication()).getGameModel();
+
         resolveViews();
         createViewModel();
         makeViewBinding();
@@ -50,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createViewModel() {
-        gameModel = new GameModel();
         gameViewModel = new GameViewModel(
                 gameModel,
                 gameGridView.getTouchesOnGrid()
