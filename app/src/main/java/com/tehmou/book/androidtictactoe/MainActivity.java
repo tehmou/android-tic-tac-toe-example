@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.tehmou.book.androidtictactoe.data.GameModel;
+import com.tehmou.book.androidtictactoe.load.LoadGameActivity;
 import com.tehmou.book.androidtictactoe.pojo.GameStatus;
 
 import rx.android.schedulers.AndroidSchedulers;
