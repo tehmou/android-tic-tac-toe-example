@@ -7,6 +7,7 @@ import android.widget.ListView;
 import com.tehmou.book.androidtictactoe.GameApplication;
 import com.tehmou.book.androidtictactoe.R;
 import com.tehmou.book.androidtictactoe.data.GameModel;
+import com.tehmou.book.androidtictactoe.pojo.SavedGame;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -31,6 +32,12 @@ public class LoadGameActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.saved_games_list);
         listView.setAdapter(listAdapter);
+
+        listView.setOnItemClickListener((adapterView, view, i, l) -> {
+            SavedGame savedGame = (SavedGame) view.getTag();
+            gameModel.putActiveGameState(savedGame.getGameState());
+            finish();
+        });
 
         subscriptions.add(
                 gameModel.getSavedGamesStream()
