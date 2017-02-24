@@ -30,8 +30,7 @@ public class LoadGameActivity extends AppCompatActivity {
                 new SavedGamesListAdapter(this, android.R.layout.simple_list_item_1);
 
         ListView listView = (ListView) findViewById(R.id.saved_games_list);
-        listView.setAdapter(listAdapter
-        );
+        listView.setAdapter(listAdapter);
 
         subscriptions.add(
                 gameModel.getSavedGamesStream()

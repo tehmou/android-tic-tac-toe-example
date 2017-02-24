@@ -1,5 +1,8 @@
 package com.tehmou.book.androidtictactoe.data;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.tehmou.book.androidtictactoe.pojo.GameGrid;
 import com.tehmou.book.androidtictactoe.pojo.GameState;
 import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
@@ -11,7 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
 public class GameModel {
-    private static final String SAVED_GAMES_FILE_NAME = "saved_games.csv";
+    private static final String SAVED_GAMES_FILE_NAME = "saved_games";
 
     private static final int GRID_WIDTH = 7;
     private static final int GRID_HEIGHT = 7;
@@ -19,11 +22,11 @@ public class GameModel {
     private static final GameState EMPTY_GAME = new GameState(EMPTY_GRID, GameSymbol.EMPTY);
 
     private final BehaviorSubject<GameState> activeGameState = BehaviorSubject.createDefault(EMPTY_GAME);
-    private final PersistedGameStore persistedGameStore =
-            new PersistedGameStore(SAVED_GAMES_FILE_NAME);
+    private final PersistedGameStore persistedGameStore;
 
-    public GameModel() {
-
+    public GameModel(Context context) {
+        SharedPreferences savedGames = context.getSharedPreferences(SAVED_GAMES_FILE_NAME, 0);
+        persistedGameStore = new PersistedGameStore(savedGames);
     }
 
     public void newGame() {
