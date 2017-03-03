@@ -12,13 +12,14 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.tehmou.book.androidtictactoe.pojo.FullGameState;
 import com.tehmou.book.androidtictactoe.pojo.GameGrid;
 import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
 import com.tehmou.book.androidtictactoe.pojo.GridPosition;
 
 public class GameGridView extends View {
     private static final String TAG = GameGridView.class.getSimpleName();
-    private GameGrid gameGrid;
+    private FullGameState data;
     private int width;
     private int height;
     private final Paint linePaint;
@@ -78,15 +79,22 @@ public class GameGridView extends View {
 
         drawSymbols(canvas, gridWidth, gridHeight, tileWidth, tileHeight);
         drawGridLines(canvas, gridWidth, gridHeight, tileWidth, tileHeight);
+        if (data.getGameStatus().isEnded()) {
+            drawWinner(canvas, tileWidth, tileHeight,
+                    data.getGameStatus().getWinningPositionStart(),
+                    data.getGameStatus().getWinningPositionEnd());
+        }
     }
 
     private void drawSymbols(Canvas canvas,
                              float gridWidth, float gridHeight,
                              float tileWidth, float tileHeight) {
-        if (gameGrid == null) {
+        if (data == null) {
             return;
         }
-        
+
+        GameGrid gameGrid = data.getGameState().getGameGrid();
+
         for (int i = 0; i < gridWidth; i++) {
             for (int n = 0; n < gridHeight; n++) {
                 GameSymbol symbol = gameGrid.getSymbolAt(i, n);
@@ -131,16 +139,16 @@ public class GameGridView extends View {
                 winnerLinePaint);
     }
 
-    public void setData(GameGrid gameGrid) {
-        this.gameGrid = gameGrid;
+    public void setData(FullGameState data) {
+        this.data = data;
         invalidate();
     }
 
     public int getGridWidth() {
-        return this.gameGrid.getWidth();
+        return data.getGameState().getGameGrid().getWidth();
     }
 
     public int getGridHeight() {
-        return this.gameGrid.getHeight();
+        return data.getGameState().getGameGrid().getHeight();
     }
 }

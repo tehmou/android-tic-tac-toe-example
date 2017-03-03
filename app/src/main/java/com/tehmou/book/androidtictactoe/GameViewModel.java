@@ -2,6 +2,7 @@ package com.tehmou.book.androidtictactoe;
 
 import android.support.v4.util.Pair;
 
+import com.tehmou.book.androidtictactoe.pojo.FullGameState;
 import com.tehmou.book.androidtictactoe.pojo.GameGrid;
 import com.tehmou.book.androidtictactoe.pojo.GameState;
 import com.tehmou.book.androidtictactoe.pojo.GameStatus;
@@ -45,10 +46,13 @@ public class GameViewModel {
                 .map(GameUtils::calculateGameStatus);
     }
 
-    public Observable<GameGrid> getGameGrid() {
-        return gameStateSubject
-                .asObservable()
-                .map(GameState::getGameGrid);
+    public Observable<GameStatus> getGameStatus() {
+        return gameStatusObservable;
+    }
+
+    public Observable<FullGameState> getFullGameState() {
+        return Observable.combineLatest(gameStateSubject, gameStatusObservable,
+                FullGameState::new);
     }
 
     public Observable<GameSymbol> getPlayerInTurn() {
@@ -103,9 +107,5 @@ public class GameViewModel {
 
     public void unsubscribe() {
         subscriptions.clear();
-    }
-
-    public Observable<GameStatus> getGameStatus() {
-        return gameStatusObservable;
     }
 }
