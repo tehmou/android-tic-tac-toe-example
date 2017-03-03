@@ -41,6 +41,7 @@ public class GameViewModel {
                     }
                 });
         gameStatusObservable = gameStateSubject
+                .map(GameState::getGameGrid)
                 .map(GameUtils::calculateGameStatus);
     }
 
