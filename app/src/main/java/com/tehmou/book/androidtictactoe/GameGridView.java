@@ -14,6 +14,7 @@ import android.view.View;
 
 import com.tehmou.book.androidtictactoe.pojo.GameGrid;
 import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
+import com.tehmou.book.androidtictactoe.pojo.GridPosition;
 
 public class GameGridView extends View {
     private static final String TAG = GameGridView.class.getSimpleName();
@@ -21,6 +22,7 @@ public class GameGridView extends View {
     private int width;
     private int height;
     private final Paint linePaint;
+    private final Paint winnerLinePaint;
     private final Paint bitmapPaint;
     private final Bitmap blackPlayerBitmap;
     private final Bitmap redPlayerBitmap;
@@ -40,6 +42,10 @@ public class GameGridView extends View {
         linePaint = new Paint();
         linePaint.setColor(Color.BLACK);
         linePaint.setStrokeWidth(8f);
+
+        winnerLinePaint = new Paint();
+        winnerLinePaint.setColor(Color.BLACK);
+        winnerLinePaint.setStrokeWidth(30f);
 
         bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -112,6 +118,17 @@ public class GameGridView extends View {
         for (int n = 0; n <= gridHeight; n++) {
             canvas.drawLine(0, n * tileHeight, width, n * tileHeight, linePaint);
         }
+    }
+
+    private void drawWinner(Canvas canvas,
+                            float tileWidth, float tileHeight,
+                            GridPosition start, GridPosition end) {
+        canvas.drawLine(
+                start.getX() * tileWidth + tileWidth / 2,
+                start.getY() * tileHeight + tileHeight / 2,
+                end.getX() * tileWidth + tileWidth / 2,
+                end.getY() * tileHeight + tileHeight / 2,
+                winnerLinePaint);
     }
 
     public void setData(GameGrid gameGrid) {
