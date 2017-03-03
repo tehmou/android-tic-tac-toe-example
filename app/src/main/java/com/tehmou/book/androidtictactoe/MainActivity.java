@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void makeViewBinding() {
         viewSubscriptions.add(
-            gameViewModel.getGameGrid()
+            gameViewModel.getFullGameState()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(gameGridView::setData)
         );
