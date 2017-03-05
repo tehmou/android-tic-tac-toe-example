@@ -3,7 +3,6 @@ package com.tehmou.book.androidtictactoe;
 import android.support.v4.util.Pair;
 
 import com.tehmou.book.androidtictactoe.pojo.FullGameState;
-import com.tehmou.book.androidtictactoe.data.GameModel;
 import com.tehmou.book.androidtictactoe.pojo.GameGrid;
 import com.tehmou.book.androidtictactoe.pojo.GameState;
 import com.tehmou.book.androidtictactoe.pojo.GameStatus;
@@ -12,12 +11,14 @@ import com.tehmou.book.androidtictactoe.pojo.GridPosition;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
 
 public class GameViewModel {
     private final CompositeDisposable subscriptions = new CompositeDisposable();
 
-    private final GameModel gameModel;
+    private final Observable<GameState> activeGameStateObservable;
+    private final Consumer<GameState> putActiveGameState;
     private final Observable<GridPosition> touchEventObservable;
 
     private final BehaviorSubject<GameState> gameStateSubject = BehaviorSubject.create();
@@ -25,11 +26,14 @@ public class GameViewModel {
     private final Observable<GameSymbol> playerInTurnObservable;
     private final Observable<GameStatus> gameStatusObservable;
 
-    public GameViewModel(GameModel gameModel,
+    public GameViewModel(Observable<GameState> activeGameStateObservable,
+                         Consumer<GameState> putActiveGameState,
                          Observable<GridPosition> touchEventObservable) {
-        this.gameModel = gameModel;
+        this.activeGameStateObservable = activeGameStateObservable;
+        this.putActiveGameState = putActiveGameState;
         this.touchEventObservable = touchEventObservable;
-        playerInTurnObservable = this.gameModel.getActiveGameState()
+
+        playerInTurnObservable = activeGameStateObservable
                 .map(GameState::getLastPlayedSymbol)
                 .map(symbol -> {
                     if (symbol == GameSymbol.BLACK) {
@@ -39,7 +43,7 @@ public class GameViewModel {
                     }
                 });
 
-        gameStatusObservable = this.gameModel.getActiveGameState()
+        gameStatusObservable = activeGameStateObservable
                 .map(GameState::getGameGrid)
                 .map(GameUtils::calculateGameStatus);
     }
@@ -58,7 +62,7 @@ public class GameViewModel {
     }
 
     public void subscribe() {
-        subscriptions.add(gameModel.getActiveGameState()
+        subscriptions.add(activeGameStateObservable
                 .subscribe(gameStateSubject::onNext)
         );
 
@@ -73,7 +77,7 @@ public class GameViewModel {
 
         Observable<GridPosition> filteredTouches =
                 gameNotEndedTouches
-                        .withLatestFrom(gameModel.getActiveGameState(), Pair::new)
+                        .withLatestFrom(activeGameStateObservable, Pair::new)
                         .map(pair -> dropMarker(pair.first, pair.second.getGameGrid()))
                         .filter(position -> position.getY() >= 0);
 
@@ -82,7 +86,7 @@ public class GameViewModel {
                         (gridPosition, gameInfo) ->
                                 gameInfo.first.setSymbolAt(
                                         gridPosition, gameInfo.second))
-                .subscribe(gameModel::putActiveGameState));
+                .subscribe(putActiveGameState));
     }
 
     private static GridPosition dropMarker(GridPosition gridPosition, GameGrid gameGrid) {
