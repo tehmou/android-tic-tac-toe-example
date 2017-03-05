@@ -55,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void createViewModel() {
         gameViewModel = new GameViewModel(
-                gameModel,
+                gameModel.getActiveGameState(),
+                gameModel::putActiveGameState,
                 gameGridView.getTouchesOnGrid()
         );
         gameViewModel.subscribe();
