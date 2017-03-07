@@ -10,24 +10,34 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import rx.functions.Action;
-import rx.functions.Action1;
-import rx.observers.TestSubscriber;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
+import io.reactivex.functions.Consumer;
+import io.reactivex.observers.TestObserver;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class GameViewModelTest {
+    final GameState EMPTY_GAME_STATE;
+
     GameViewModel gameViewModel;
     BehaviorSubject<GameState> gameStateMock;
-    Action1<GameState> putActiveGameStateMock;
+    Consumer<GameState> putActiveGameStateMock;
     PublishSubject<GridPosition> touchEventMock;
+
+    public GameViewModelTest() {
+        GameGrid gameGrid = new GameGrid(7, 7);
+        GameSymbol gameSymbol = GameSymbol.EMPTY;
+        EMPTY_GAME_STATE = new GameState(
+                gameGrid, gameSymbol
+        );
+    }
 
     @Before
     public void setup() {
         gameStateMock = BehaviorSubject.create();
-        putActiveGameStateMock = Mockito.mock(Action1.class);
+        putActiveGameStateMock = Mockito.mock(Consumer.class);
         touchEventMock = PublishSubject.create();
         gameViewModel = new GameViewModel(
                 gameStateMock,
@@ -37,26 +47,28 @@ public class GameViewModelTest {
     }
 
     @Test
-    public void initialState() throws Exception {
+    public void testInitialState() {
         // Assemble
-        TestSubscriber<FullGameState> testSubscriber = new TestSubscriber<>();
-        gameViewModel.getFullGameState().subscribe(testSubscriber);
-
-        GameGrid gameGrid = new GameGrid(7, 7);
-        GameSymbol gameSymbol = GameSymbol.BLACK;
-        GameState gameState = new GameState(
-                gameGrid, gameSymbol
-        );
+        TestObserver<FullGameState> testObserver = new TestObserver<>();
+        gameViewModel.getFullGameState().subscribe(testObserver);
 
         // Act
         gameViewModel.subscribe();
-        gameStateMock.onNext(gameState);
+        gameStateMock.onNext(EMPTY_GAME_STATE);
 
         // Assert
-        testSubscriber.assertValueCount(1);
-        FullGameState fullGameState = testSubscriber.getOnNextEvents().get(0);
+
+        // Check we don't create a cyclic loop of putting back what we received
+        try {
+            verify(putActiveGameStateMock, never()).accept(any());
+        } catch (Exception e) {
+            fail();
+        }
+
+        // Check that we receive the FullGameState once
+        testObserver.assertValueCount(1);
+        FullGameState fullGameState = testObserver.values().get(0);
         assertFalse(fullGameState.getGameStatus().isEnded());
-        assertEquals(gameState, fullGameState.getGameState());
-        assertFalse(fullGameState.getGameStatus().isEnded());
+        assertEquals(EMPTY_GAME_STATE, fullGameState.getGameState());
     }
 }

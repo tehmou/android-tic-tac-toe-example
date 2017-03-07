@@ -1,5 +1,8 @@
 package com.tehmou.book.androidtictactoe.pojo;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class GameGrid {
     private final int width;
     private final int height;
@@ -50,5 +53,25 @@ public class GameGrid {
 
     public int getHeight() {
         return height;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof GameGrid &&
+                ((GameGrid) obj).width == width &&
+                ((GameGrid) obj).height == height &&
+                contentEquals(((GameGrid) obj).grid);
+    }
+
+    private boolean contentEquals(GameSymbol[][] grid) {
+        if (this.grid.length != grid.length) {
+            return false;
+        }
+        for (int i = 0; i < grid.length; i++) {
+            if (!Arrays.equals(this.grid[i], grid[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 }
