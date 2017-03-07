@@ -26,4 +26,11 @@ public class GameState {
     public boolean isEmpty(GridPosition gridPosition) {
         return gameGrid.getSymbolAt(gridPosition) == GameSymbol.EMPTY;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof GameState &&
+                ((GameState) obj).gameGrid.equals(gameGrid) &&
+                ((GameState) obj).lastPlayedSymbol.equals(lastPlayedSymbol);
+    }
 }

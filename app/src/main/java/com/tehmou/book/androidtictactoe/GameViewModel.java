@@ -66,44 +66,12 @@ public class GameViewModel {
                 .subscribe(gameStateSubject::onNext)
         );
 
-        Observable<Pair<GameState, GameSymbol>> gameInfoObservable =
-                Observable.combineLatest(gameStateSubject, playerInTurnObservable, Pair::new);
-
-        Observable<GridPosition> gameNotEndedTouches =
+        subscriptions.add(GameUtils.processGamesMoves(
+                activeGameStateObservable,
+                gameStatusObservable,
+                playerInTurnObservable,
                 touchEventObservable
-                        .withLatestFrom(gameStatusObservable, Pair::new)
-                        .filter(pair -> !pair.second.isEnded())
-                        .map(pair -> pair.first);
-
-        Observable<GridPosition> filteredTouches =
-                gameNotEndedTouches
-                        .withLatestFrom(activeGameStateObservable, Pair::new)
-                        .map(pair -> dropMarker(pair.first, pair.second.getGameGrid()))
-                        .filter(position -> position.getY() >= 0);
-
-        subscriptions.add(filteredTouches
-                .withLatestFrom(gameInfoObservable,
-                        (gridPosition, gameInfo) ->
-                                gameInfo.first.setSymbolAt(
-                                        gridPosition, gameInfo.second))
-                .subscribe(putActiveGameState));
-    }
-
-    private static GridPosition dropMarker(GridPosition gridPosition, GameGrid gameGrid) {
-        int i = gameGrid.getHeight() - 1;
-        for (; i >= -1; i--) {
-            if (i == -1) {
-                // Let -1 fall through
-                break;
-            }
-            GameSymbol symbol =
-                    gameGrid.getSymbolAt(
-                            gridPosition.getX(), i);
-            if (symbol == GameSymbol.EMPTY) {
-                break;
-            }
-        }
-        return new GridPosition(gridPosition.getX(), i);
+        ).subscribe(putActiveGameState));
     }
 
     public void unsubscribe() {

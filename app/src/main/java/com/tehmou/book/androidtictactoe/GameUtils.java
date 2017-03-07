@@ -1,9 +1,14 @@
 package com.tehmou.book.androidtictactoe;
 
+import android.support.v4.util.Pair;
+
 import com.tehmou.book.androidtictactoe.pojo.GameGrid;
+import com.tehmou.book.androidtictactoe.pojo.GameState;
 import com.tehmou.book.androidtictactoe.pojo.GameStatus;
 import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
 import com.tehmou.book.androidtictactoe.pojo.GridPosition;
+
+import rx.Observable;
 
 public class GameUtils {
     public static GameStatus calculateGameStatus(GameGrid gameGrid) {
@@ -47,5 +52,51 @@ public class GameUtils {
             }
         }
         return GameStatus.ongoing();
+    }
+
+    public static Observable<GameState> processGamesMoves(Observable<GameState> gameStateObservable,
+                                                          Observable<GameStatus> gameStatusObservable,
+                                                          Observable<GameSymbol> playerInTurnObservable,
+                                                          Observable<GridPosition> touchEventObservable) {
+        Observable<Pair<GameState, GameSymbol>> gameInfoObservable =
+                Observable.combineLatest(gameStateObservable, playerInTurnObservable, Pair::new);
+
+        Observable<GridPosition> gameNotEndedTouches =
+                touchEventObservable
+                        .withLatestFrom(gameStatusObservable, Pair::new)
+                        .filter(pair -> !pair.second.isEnded())
+                        .map(pair -> pair.first);
+
+        Observable<GridPosition> filteredTouches =
+                gameNotEndedTouches
+                        .withLatestFrom(gameStateObservable, Pair::new)
+                        .map(pair -> dropMarker(pair.first, pair.second.getGameGrid()))
+                        .filter(position -> position.getY() >= 0);
+
+        Observable<GameState> updatedGameStateObservable =
+                filteredTouches
+                        .withLatestFrom(gameInfoObservable,
+                                (gridPosition, gameInfo) ->
+                                        gameInfo.first.setSymbolAt(
+                                                gridPosition, gameInfo.second));
+
+        return updatedGameStateObservable;
+    }
+
+    public static GridPosition dropMarker(GridPosition gridPosition, GameGrid gameGrid) {
+        int i = gameGrid.getHeight() - 1;
+        for (; i >= -1; i--) {
+            if (i == -1) {
+                // Let -1 fall through
+                break;
+            }
+            GameSymbol symbol =
+                    gameGrid.getSymbolAt(
+                            gridPosition.getX(), i);
+            if (symbol == GameSymbol.EMPTY) {
+                break;
+            }
+        }
+        return new GridPosition(gridPosition.getX(), i);
     }
 }
