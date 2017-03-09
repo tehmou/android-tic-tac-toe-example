@@ -2,6 +2,7 @@ package com.tehmou.book.androidtictactoe;
 
 import android.support.v4.util.Pair;
 
+import com.tehmou.book.androidtictactoe.pojo.FullGameState;
 import com.tehmou.book.androidtictactoe.pojo.GameGrid;
 import com.tehmou.book.androidtictactoe.pojo.GameState;
 import com.tehmou.book.androidtictactoe.pojo.GameStatus;
@@ -9,45 +10,51 @@ import com.tehmou.book.androidtictactoe.pojo.GameSymbol;
 import com.tehmou.book.androidtictactoe.pojo.GridPosition;
 
 import rx.Observable;
+import rx.functions.Action1;
 import rx.subjects.BehaviorSubject;
 import rx.subscriptions.CompositeSubscription;
 
 public class GameViewModel {
-    private static final int GRID_WIDTH = 3;
-    private static final int GRID_HEIGHT = 3;
-    private static final GameGrid EMPTY_GRID = new GameGrid(GRID_WIDTH, GRID_HEIGHT);
-    private static final GameState EMPTY_GAME = new GameState(EMPTY_GRID, GameSymbol.EMPTY);
-
     private final CompositeSubscription subscriptions = new CompositeSubscription();
 
-    private final BehaviorSubject<GameState> gameStateSubject = BehaviorSubject.create(EMPTY_GAME);
+    private final Observable<GameState> activeGameStateObservable;
+    private final Action1<GameState> putActiveGameState;
+    private final Observable<GridPosition> touchEventObservable;
+
+    private final BehaviorSubject<GameState> gameStateSubject = BehaviorSubject.create();
+
     private final Observable<GameSymbol> playerInTurnObservable;
     private final Observable<GameStatus> gameStatusObservable;
 
-    private final Observable<GridPosition> touchEventObservable;
-    private final Observable<Void> newGameEventObservable;
-
-    public GameViewModel(Observable<GridPosition> touchEventObservable,
-                         Observable<Void> newGameEventObservable) {
+    public GameViewModel(Observable<GameState> activeGameStateObservable,
+                         Action1<GameState> putActiveGameState,
+                         Observable<GridPosition> touchEventObservable) {
+        this.activeGameStateObservable = activeGameStateObservable;
+        this.putActiveGameState = putActiveGameState;
         this.touchEventObservable = touchEventObservable;
-        this.newGameEventObservable = newGameEventObservable;
-        playerInTurnObservable = gameStateSubject
+
+        playerInTurnObservable = activeGameStateObservable
                 .map(GameState::getLastPlayedSymbol)
                 .map(symbol -> {
-                    if (symbol == GameSymbol.CIRCLE) {
-                        return GameSymbol.CROSS;
+                    if (symbol == GameSymbol.BLACK) {
+                        return GameSymbol.RED;
                     } else {
-                        return GameSymbol.CIRCLE;
+                        return GameSymbol.BLACK;
                     }
                 });
-        gameStatusObservable = gameStateSubject
+
+        gameStatusObservable = activeGameStateObservable
+                .map(GameState::getGameGrid)
                 .map(GameUtils::calculateGameStatus);
     }
 
-    public Observable<GameGrid> getGameGrid() {
-        return gameStateSubject
-                .asObservable()
-                .map(GameState::getGameGrid);
+    public Observable<GameStatus> getGameStatus() {
+        return gameStatusObservable;
+    }
+
+    public Observable<FullGameState> getFullGameState() {
+        return Observable.combineLatest(gameStateSubject, gameStatusObservable,
+                FullGameState::new);
     }
 
     public Observable<GameSymbol> getPlayerInTurn() {
@@ -55,43 +62,19 @@ public class GameViewModel {
     }
 
     public void subscribe() {
-        subscriptions.add(newGameEventObservable
-                .map(ignore -> EMPTY_GAME)
+        subscriptions.add(activeGameStateObservable
                 .subscribe(gameStateSubject::onNext)
         );
 
-        Observable<Pair<GameState, GameSymbol>> gameInfoObservable =
-                Observable.combineLatest(gameStateSubject, playerInTurnObservable, Pair::new);
-
-        Observable<GridPosition> gameNotEndedTouches =
+        subscriptions.add(GameUtils.processGamesMoves(
+                activeGameStateObservable,
+                gameStatusObservable,
+                playerInTurnObservable,
                 touchEventObservable
-                        .withLatestFrom(gameStatusObservable, Pair::new)
-                        .filter(pair -> !pair.second.isEnded())
-                        .map(pair -> pair.first);
-
-        Observable<GridPosition> filteredTouches =
-                gameNotEndedTouches
-                        .withLatestFrom(gameStateSubject, Pair::new)
-                        .filter(pair -> {
-                            GridPosition gridPosition = pair.first;
-                            GameState gameState = pair.second;
-                            return gameState.isEmpty(gridPosition);
-                        })
-                        .map(pair -> pair.first);
-
-        subscriptions.add(filteredTouches
-                .withLatestFrom(gameInfoObservable,
-                        (gridPosition, gameInfo) ->
-                                gameInfo.first.setSymbolAt(
-                                        gridPosition, gameInfo.second))
-                .subscribe(gameStateSubject::onNext));
+        ).subscribe(putActiveGameState));
     }
 
     public void unsubscribe() {
         subscriptions.clear();
-    }
-
-    public Observable<GameStatus> getGameStatus() {
-        return gameStatusObservable;
     }
 }
